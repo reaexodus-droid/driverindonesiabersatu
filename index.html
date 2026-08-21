@@ -3,226 +3,1688 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SatuAspal | Komunitas Driver Ojol Profesional</title>
+    
+    <!-- Google Fonts: Inter for a very clean, elegant, and highly readable look -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
 
-    <title>Driver Map</title>
+/* ================================
+   CSS RESET & VARIABLES
+================================ */
 
-    <link rel="stylesheet" href="style.css">
+:root {
+    --bg-color: #f9fafb;
+    --surface-color: #ffffff;
+    --text-primary: #111827;
+    --text-secondary: #6b7280;
+    --accent-color: #0f172a;
+    --border-color: #e5e7eb;
+
+    --gojek: #00aa13;
+    --grab: #00b14f;
+    --shopee: #ee4d2d;
+    --maxim: #ffcc00;
+    --lalamove: #f37021;
+    --indrive: #00ffee;
+
+    --container-padding: clamp(1rem, 5vw, 5%);
+}
+
+/* ================================
+   RESET
+================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 80px;
+    overflow-x: hidden;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    line-height: 1.6;
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+}
+
+img {
+    display: block;
+    max-width: 100%;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+button,
+a {
+    -webkit-tap-highlight-color: transparent;
+}
+
+
+/* ================================
+   TELEGRAM INFO LINK
+================================ */
+
+.telegram-info {
+    margin-top: 1.25rem;
+    border: none;
+    background: transparent;
+    color: #94a3b8;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    transition: color 0.2s ease;
+}
+
+.telegram-info i {
+    font-size: 0.7rem;
+    transition: transform 0.2s ease;
+}
+
+.telegram-info:hover {
+    color: #ffffff;
+}
+
+.telegram-info:hover i {
+    transform: translateX(3px);
+}
+
+
+/* ================================
+   TELEGRAM MODAL
+================================ */
+
+.telegram-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    visibility: hidden;
+    opacity: 0;
+    transition:
+        opacity 0.25s ease,
+        visibility 0.25s ease;
+}
+
+.telegram-modal.active {
+    visibility: visible;
+    opacity: 1;
+}
+
+.telegram-modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.65);
+    backdrop-filter: blur(5px);
+}
+
+
+/* MODAL BOX */
+
+.telegram-modal-box {
+    position: relative;
+    width: 100%;
+    max-width: 540px;
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+    background: var(--surface-color);
+    color: var(--text-primary);
+    border-radius: 20px;
+    padding: clamp(1.5rem, 5vw, 2.5rem);
+    box-shadow:
+        0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    transform: translateY(20px) scale(0.97);
+    transition: transform 0.25s ease;
+}
+
+.telegram-modal.active .telegram-modal-box {
+    transform: translateY(0) scale(1);
+}
+
+
+/* CLOSE BUTTON */
+
+.telegram-modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 50%;
+    background: var(--bg-color);
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+.telegram-modal-close:hover {
+    background: var(--border-color);
+    color: var(--text-primary);
+}
+
+
+/* MODAL ICON */
+
+.telegram-modal-icon {
+    width: 52px;
+    height: 52px;
+    margin-bottom: 1.25rem;
+    border-radius: 14px;
+    background: #e8f3ff;
+    color: #229ed9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+}
+
+
+/* MODAL TITLE */
+
+.telegram-modal-box h3 {
+    font-size: clamp(1.4rem, 4vw, 1.8rem);
+    line-height: 1.2;
+    margin-bottom: 0.75rem;
+    padding-right: 2rem;
+}
+
+.telegram-modal-intro {
+    color: var(--text-secondary);
+    font-size: 0.92rem;
+    line-height: 1.65;
+    margin-bottom: 1.5rem;
+}
+
+
+/* REASONS */
+
+.telegram-reasons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+}
+
+.telegram-reason {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+}
+
+.reason-icon {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    border-radius: 10px;
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-color);
+    font-size: 0.9rem;
+}
+
+.telegram-reason h4 {
+    font-size: 0.9rem;
+    margin-bottom: 0.2rem;
+}
+
+.telegram-reason p {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    line-height: 1.5;
+}
+
+
+/* MODAL BUTTON */
+
+.telegram-modal-button {
+    margin-top: 1.5rem;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0.9rem 1.2rem;
+    border-radius: 8px;
+    background: var(--accent-color);
+    color: #fff;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition:
+        transform 0.2s ease,
+        opacity 0.2s ease;
+}
+
+.telegram-modal-button:hover {
+    transform: translateY(-1px);
+    opacity: 0.92;
+}
+
+
+/* ================================
+   NAVBAR
+================================ */
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 72px;
+    padding: 0 var(--container-padding);
+    background-color: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-color);
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+.logo {
+    flex-shrink: 0;
+    font-size: clamp(1.05rem, 2vw, 1.25rem);
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.logo-icon {
+    background-color: var(--accent-color);
+    color: #fff;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+
+/* ================================
+   NAV LINKS
+================================ */
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: clamp(1rem, 3vw, 2.5rem);
+    list-style: none;
+}
+
+.nav-links > li {
+    position: relative;
+}
+
+.nav-links li a {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    transition: color 0.2s ease;
+}
+
+.nav-links li a:hover {
+    color: var(--text-primary);
+}
+
+
+/* ================================
+   FASILITAS DROPDOWN
+================================ */
+
+.nav-dropdown {
+    position: relative;
+}
+
+.nav-dropdown-toggle {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.nav-dropdown-toggle i {
+    font-size: 0.65rem;
+    transition: transform 0.2s ease;
+}
+
+
+/* DROPDOWN BOX */
+
+.dropdown-menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 50%;
+    min-width: 190px;
+    padding: 0.5rem;
+    list-style: none;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.10);
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    transform: translateX(-50%) translateY(-8px);
+
+    transition:
+        opacity 0.2s ease,
+        transform 0.2s ease,
+        visibility 0.2s ease;
+
+    z-index: 1100;
+}
+
+
+/* DROPDOWN MUNCUL SAAT HOVER */
+
+.nav-dropdown:hover .dropdown-menu,
+.nav-dropdown.active .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0);
+}
+
+
+/* ICON PANAH */
+
+.nav-dropdown:hover .nav-dropdown-toggle i,
+.nav-dropdown.active .nav-dropdown-toggle i {
+    transform: rotate(180deg);
+}
+
+
+/* DROPDOWN ITEMS */
+
+.dropdown-menu li {
+    width: 100%;
+    border: none !important;
+}
+
+.dropdown-menu li a {
+    display: flex !important;
+    align-items: center;
+    gap: 9px;
+
+    width: 100%;
+    padding: 0.7rem 0.85rem;
+
+    border-radius: 8px;
+
+    font-size: 0.85rem !important;
+    color: var(--text-secondary);
+
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease;
+}
+
+.dropdown-menu li a:hover {
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+}
+
+
+/* ICON DROPDOWN */
+
+.dropdown-menu li a i {
+    width: 18px;
+    text-align: center;
+    font-size: 0.8rem;
+}
+
+
+/* ================================
+   NAV BUTTON
+================================ */
+
+.btn-nav {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--accent-color);
+    color: #fff !important;
+    padding: 0.55rem 1.1rem;
+    border-radius: 6px;
+    transition: opacity 0.2s;
+}
+
+.btn-nav:hover {
+    opacity: 0.9;
+}
+
+
+/* ================================
+   MOBILE MENU BUTTON
+================================ */
+
+.menu-toggle {
+    display: none;
+    width: 40px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+    cursor: pointer;
+    color: var(--text-primary);
+    flex-shrink: 0;
+}
+
+
+/* ================================
+   HERO
+================================ */
+
+.hero {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+
+    padding:
+        clamp(6rem, 12vw, 9rem)
+        var(--container-padding)
+        clamp(3rem, 7vw, 5rem);
+
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+
+    align-items: center;
+    gap: clamp(2rem, 6vw, 5rem);
+
+    background-color: var(--surface-color);
+    min-height: 85vh;
+}
+
+.hero-text {
+    min-width: 0;
+    max-width: 600px;
+}
+
+.tagline {
+    display: inline-block;
+    font-size: clamp(0.7rem, 1.5vw, 0.85rem);
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 1rem;
+}
+
+.hero-text h1 {
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -1px;
+    margin-bottom: 1.5rem;
+    color: var(--text-primary);
+    overflow-wrap: break-word;
+}
+
+.hero-text p {
+    font-size: clamp(0.95rem, 2vw, 1.1rem);
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+    line-height: 1.7;
+    max-width: 580px;
+}
+
+
+/* ================================
+   PRIMARY BUTTON
+================================ */
+
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    background-color: var(--accent-color);
+    color: #fff;
+
+    padding: 0.9rem 1.5rem;
+    border-radius: 8px;
+
+    font-weight: 500;
+    font-size: 1rem;
+
+    transition:
+        transform 0.2s,
+        box-shadow 0.2s;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow:
+        0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+
+/* ================================
+   HERO IMAGE
+================================ */
+
+.hero-image {
+    width: 100%;
+    min-width: 0;
+}
+
+.hero-image img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+
+    border-radius: clamp(12px, 2vw, 20px);
+
+    box-shadow:
+        0 20px 25px -5px rgba(0, 0, 0, 0.1),
+        0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+
+/* ================================
+   PARTNERS
+================================ */
+
+.partners {
+    padding: clamp(3rem, 7vw, 4rem) var(--container-padding);
+
+    background-color: var(--bg-color);
+
+    text-align: center;
+
+    border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.partners p {
+    font-size: clamp(0.8rem, 2vw, 0.9rem);
+    color: var(--text-secondary);
+    font-weight: 500;
+    margin-bottom: 2rem;
+}
+
+.brand-pills {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+.pill {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    padding: 0.6rem 1rem;
+
+    background-color: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 50px;
+
+    font-size: clamp(0.8rem, 2vw, 0.9rem);
+    font-weight: 600;
+    color: var(--text-primary);
+
+    transition: all 0.2s ease;
+
+    cursor: default;
+}
+
+.pill:hover {
+    border-color: #d1d5db;
+
+    box-shadow:
+        0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+
+/* BRAND ICONS */
+
+.pill i {
+    font-size: 0.95rem;
+}
+
+.icon-gojek {
+    color: var(--gojek);
+}
+
+.icon-grab {
+    color: var(--grab);
+}
+
+.icon-shopee {
+    color: var(--shopee);
+}
+
+.icon-maxim {
+    color: var(--maxim);
+}
+
+.icon-lalamove {
+    color: var(--lalamove);
+}
+
+.icon-indrive {
+    color: var(--indrive);
+}
+
+
+/* ================================
+   FEATURES
+================================ */
+
+.features {
+    padding: clamp(4rem, 8vw, 6rem) var(--container-padding);
+    background-color: var(--surface-color);
+}
+
+.section-header {
+    width: 100%;
+    max-width: 650px;
+    margin: 0 auto clamp(2.5rem, 6vw, 4rem);
+    text-align: center;
+}
+
+.section-header h2 {
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 1rem;
+}
+
+.section-header p {
+    color: var(--text-secondary);
+    font-size: clamp(0.95rem, 2vw, 1.1rem);
+}
+
+.features-grid {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+
+    gap: clamp(1rem, 3vw, 2.5rem);
+}
+
+.feature-card {
+    background-color: var(--bg-color);
+
+    padding: clamp(1.5rem, 4vw, 2.5rem);
+
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
+
+    transition: all 0.3s ease;
+}
+
+.feature-card:hover {
+    background-color: var(--surface-color);
+
+    box-shadow:
+        0 20px 25px -5px rgba(0, 0, 0, 0.05);
+
+    border-color: transparent;
+
+    transform: translateY(-5px);
+}
+
+.feature-icon {
+    width: 48px;
+    height: 48px;
+
+    background-color: var(--surface-color);
+
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 1.2rem;
+    color: var(--accent-color);
+
+    margin-bottom: 1.5rem;
+}
+
+.feature-card h3 {
+    font-size: clamp(1.05rem, 2vw, 1.25rem);
+    font-weight: 600;
+
+    margin-bottom: 1rem;
+
+    color: var(--text-primary);
+}
+
+.feature-card p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+
+/* ================================
+   CTA
+================================ */
+
+.cta-section {
+    padding: clamp(2.5rem, 7vw, 5rem) var(--container-padding);
+    background-color: var(--bg-color);
+}
+
+.cta-box {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+
+    background-color: var(--accent-color);
+    color: #fff;
+
+    padding:
+        clamp(2.5rem, 7vw, 4rem)
+        clamp(1.25rem, 5vw, 3rem);
+
+    border-radius: clamp(16px, 3vw, 24px);
+
+    text-align: center;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.cta-box h2 {
+    font-size: clamp(1.8rem, 5vw, 2.5rem);
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin-bottom: 1rem;
+}
+
+.cta-box p {
+    width: 100%;
+    max-width: 500px;
+
+    font-size: clamp(0.95rem, 2vw, 1.1rem);
+    color: #94a3b8;
+
+    margin-bottom: 2rem;
+}
+
+.btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    background-color: #fff;
+    color: var(--accent-color);
+
+    padding: 0.9rem 1.5rem;
+    border-radius: 8px;
+
+    font-weight: 600;
+    font-size: 1rem;
+    text-align: center;
+
+    transition: background-color 0.2s;
+}
+
+.btn-secondary:hover {
+    background-color: #f1f5f9;
+}
+
+
+/* ================================
+   FOOTER
+================================ */
+
+footer {
+    padding: 0.9rem var(--container-padding);
+
+    background-color: var(--surface-color);
+
+    border-top: 1px solid var(--border-color);
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 1.5rem;
+
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+}
+
+.footer-social {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    text-align: center;
+}
+
+.social-icons {
+    display: flex;
+    gap: 10px;
+}
+
+.footer-social-text {
+    font-size: 0.8rem;
+    line-height: 1.2;
+    margin-top: 2px;
+}
+
+.footer-social a {
+    color: var(--text-secondary);
+    font-size: 1.2rem;
+
+    transition: color 0.2s;
+}
+
+.footer-social a:hover {
+    color: var(--accent-color);
+}
+
+
+/* ================================
+   TABLET
+================================ */
+
+@media (max-width: 992px) {
+
+    .hero {
+        grid-template-columns: 1fr;
+
+        text-align: center;
+
+        min-height: auto;
+
+        padding-top: 7rem;
+    }
+
+    .hero-text {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    .hero-text p {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .hero-image {
+        width: 100%;
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    .hero-image img {
+        aspect-ratio: auto;
+    }
+}
+
+
+/* ================================
+   MOBILE NAV
+================================ */
+
+@media (max-width: 768px) {
+
+    nav {
+        height: 64px;
+    }
+
+    .menu-toggle {
+        display: flex;
+    }
+
+
+    /* MOBILE NAV CONTAINER */
+
+    .nav-links {
+        position: absolute;
+
+        top: 64px;
+        left: 0;
+
+        width: 100%;
+
+        background-color: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(10px);
+
+        flex-direction: column;
+        align-items: stretch;
+
+        gap: 0;
+
+        border-bottom: 1px solid var(--border-color);
+
+        max-height: 0;
+        overflow: hidden;
+
+        transition:
+            max-height 0.35s ease,
+            box-shadow 0.3s ease;
+    }
+
+    .nav-links.active {
+        max-height: 500px;
+
+        box-shadow:
+            0 10px 20px rgba(0, 0, 0, 0.05);
+    }
+
+
+    /* MOBILE NAV ITEM */
+
+    .nav-links > li {
+        width: 100%;
+        text-align: center;
+
+        padding: 0;
+
+        border-bottom: 1px solid #f3f4f6;
+    }
+
+
+    .nav-links li a {
+        display: block;
+
+        width: 100%;
+
+        padding: 1rem;
+    }
+
+
+    .nav-links li:last-child {
+        border-bottom: none;
+        padding: 0;
+    }
+
+
+    /* ================================
+   MOBILE FASILITAS DROPDOWN
+================================ */
+
+.nav-dropdown {
+    position: static;
+}
+
+/* Tombol Fasilitas */
+.nav-dropdown-toggle {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    width: 100%;
+    cursor: pointer;
+}
+
+.nav-dropdown-toggle i {
+    font-size: 0.65rem;
+    transition: transform 0.2s ease;
+}
+
+/* Dropdown mobile */
+.dropdown-menu {
+    position: static;
+
+    width: 100%;
+    min-width: 0;
+
+    margin: 0;
+    padding: 0;
+
+    background: #f8fafc;
+
+    border: none;
+    border-radius: 0;
+
+    box-shadow: none;
+    backdrop-filter: none;
+
+    transform: none;
+
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+
+    display: none;
+}
+
+/* Dropdown terbuka */
+.nav-dropdown.active .dropdown-menu {
+    display: block;
+}
+
+/* Jangan gunakan hover desktop di mobile */
+.nav-dropdown:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: none;
+}
+
+/* Panah saat terbuka */
+.nav-dropdown.active .nav-dropdown-toggle i {
+    transform: rotate(180deg);
+}
+
+/* Item dropdown */
+.dropdown-menu li {
+    width: 100%;
+    border: none !important;
+}
+
+/* Link dropdown */
+.dropdown-menu li a {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+
+    padding: 0.8rem 1rem;
+
+    font-size: 0.85rem !important;
+    font-weight: 500;
+
+    color: var(--text-secondary);
+
+    background: #f8fafc;
+
+    border-radius: 0;
+
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease;
+}
+
+.dropdown-menu li a:hover {
+    background-color: #eef2f7;
+    color: var(--text-primary);
+}
+
+/* ================================
+   KOMUNITAS AREA MOBILE
+================================ */
+
+.nav-links .btn-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: calc(100% - 2rem);
+
+    margin: 0.75rem 1rem 1rem;
+
+    padding: 0.8rem 1rem;
+}
+
+
+    /* HERO */
+
+    .hero {
+        padding-top: 5.5rem;
+    }
+
+    .hero-text h1 {
+        letter-spacing: -0.8px;
+    }
+
+    .hero-image img {
+        border-radius: 14px;
+    }
+
+    .feature-card:hover {
+        transform: none;
+    }
+
+
+    /* FOOTER */
+
+    footer {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+}
+
+
+/* ================================
+   SMALL MOBILE
+================================ */
+
+@media (max-width: 480px) {
+
+    :root {
+        --container-padding: 1rem;
+    }
+
+    .logo {
+        font-size: 1rem;
+    }
+
+    .logo-icon {
+        width: 30px;
+        height: 30px;
+        font-size: 0.8rem;
+    }
+
+    .hero {
+        padding-top: 5.25rem;
+        gap: 2rem;
+    }
+
+    .tagline {
+        font-size: 0.65rem;
+        letter-spacing: 1px;
+    }
+
+    .hero-text h1 {
+        font-size: 2rem;
+        line-height: 1.15;
+        margin-bottom: 1.2rem;
+    }
+
+    .hero-text p {
+        font-size: 0.9rem;
+        line-height: 1.65;
+        margin-bottom: 1.5rem;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+        width: 100%;
+        max-width: 320px;
+
+        padding:
+            0.85rem 1rem;
+
+        font-size: 0.9rem;
+    }
+
+    .hero-image img {
+        aspect-ratio: auto;
+        border-radius: 12px;
+    }
+
+    .partners p {
+        max-width: 300px;
+
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .brand-pills {
+        gap: 0.5rem;
+    }
+
+    .pill {
+        flex: 0 1 auto;
+
+        padding:
+            0.5rem 0.8rem;
+
+        font-size: 0.75rem;
+    }
+
+    .features {
+        padding-top: 3.5rem;
+        padding-bottom: 3.5rem;
+    }
+
+    .section-header {
+        margin-bottom: 2rem;
+    }
+
+    .section-header h2 {
+        font-size: 1.75rem;
+    }
+
+    .section-header p {
+        font-size: 0.9rem;
+    }
+
+    .features-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .feature-card {
+        padding: 1.5rem;
+    }
+
+    .feature-card p {
+        font-size: 0.9rem;
+    }
+
+    .cta-section {
+        padding: 2rem 1rem;
+    }
+
+    .cta-box {
+        padding:
+            2.5rem 1.25rem;
+
+        border-radius: 16px;
+    }
+
+    .cta-box h2 {
+        font-size: 1.75rem;
+    }
+
+    .cta-box p {
+        font-size: 0.9rem;
+    }
+
+    footer {
+        padding: 1.5rem 1rem;
+        font-size: 0.8rem;
+    }
+
+    .footer-social {
+        gap: 1.2rem;
+    }
+
+
+    /* MOBILE DROPDOWN */
+
+    .dropdown-menu li a {
+        padding:
+            0.75rem 1rem;
+
+        font-size: 0.8rem !important;
+    }
+}
+
+
+/* ================================
+   VERY SMALL DEVICE
+================================ */
+
+@media (max-width: 360px) {
+
+    .hero-text h1 {
+        font-size: 1.75rem;
+    }
+
+    .hero-text p {
+        font-size: 0.85rem;
+    }
+
+    .pill {
+        font-size: 0.7rem;
+        padding:
+            0.45rem 0.7rem;
+    }
+
+    .feature-card {
+        padding: 1.25rem;
+    }
+
+    .feature-card h3 {
+        font-size: 1rem;
+    }
+
+    .feature-card p {
+        font-size: 0.85rem;
+    }
+
+    .cta-box h2 {
+        font-size: 1.55rem;
+    }
+}
+
+
+/* ================================
+   ACCESSIBILITY
+================================ */
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+    }
+}
+
+</style>
 </head>
-
 <body>
 
-    <!-- MAP -->
-    <div id="map"></div>
-
-
-    <!-- SEARCH -->
-    <div class="search-container">
-
-        <div class="search-box">
-
-            <span class="search-icon">⌕</span>
-
-            <input
-                id="searchInput"
-                type="text"
-                placeholder="Cari lokasi atau tempat..."
-                autocomplete="off"
-            >
-
-            <button
-                id="clearSearch"
-                class="clear-search"
-                type="button"
-            >
-                ×
-            </button>
-
+    <!-- NAVBAR -->
+    <nav>
+        <div class="logo">
+            <div class="logo-icon"><i class="fas fa-route"></i></div>
+            SatuAspal
         </div>
+        <ul class="nav-links" id="navMenu">
+            <li><a href="coomingsoonfasilitas.html">Spot Gacor</a></li>
+            <li><a href="coomingsoonfasilitas.html">Maps Data</a></li>
+          <!--   <li class="nav-dropdown">
+                <a href="#fasilitas" class="nav-dropdown-toggle">
+                    Fasilitas
+                    <i class="fas fa-chevron-down"></i>
+                </a>
 
-    </div>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a href="#spot-gacor">Spot Gacor</a>
+                    </li>
+                    <li>
+                        <a href="#maps-data">Maps Data</a>
+                    </li>
+                </ul>
+            </li>-->
+            <li><a href="#" class="btn-nav">Komunitas Area</a></li>
+        </ul>
+        <div class="menu-toggle" onclick="toggleMenu()">
+            <i class="fas fa-bars"></i>
+        </div>
+    </nav>
+   <!-- CTA SECTION -->
+    <!-- HERO SECTION -->
+    <section class="hero">
+        <div class="hero-text">
+            <span class="tagline">Komunitas Independen</span>
+            <h1>Rumah Baru untuk Pejuang Aspal.</h1>
+            <p>Wadah berkumpul yang dirancang khusus untuk membangun relasi, berbagi informasi lapangan, dan menjaga solidaritas antar mitra pengemudi dari seluruh penjuru Indonesia.</p>
+           <a href="#cta" class="btn-primary">
+                Gabung Komunitas <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+        <div class="hero-image">
+            <img src="bg1.jpg" alt="Driver Ojol Profesional">
+        </div>
+    </section>
 
+    <!-- BRAND PILLS (DENGAN IKON PERUSAHAAN) -->
+    <section class="partners">
+        <p>Kebersamaan Driver dari Berbagai Platform</p>
+        <div class="brand-pills">
+            <div class="pill"><i class="fas fa-motorcycle icon-gojek"></i> Gojek</div>
+            <div class="pill"><i class="fas fa-car icon-grab"></i> Grab</div>
+            <div class="pill"><i class="fas fa-shopping-bag icon-shopee"></i> Shopee</div>
+            <div class="pill"><i class="fas fa-map-marker-alt icon-maxim"></i> Maxim</div>
+            <div class="pill"><i class="fas fa-box-open icon-lalamove"></i> Lalamove</div>
+            <div class="pill"><i class="fas fa-map-pin icon-indrive"></i> inDrive</div>
+        </div>
+    </section>
 
-    <!-- GPS STATUS -->
-    <div
-        id="gpsStatus"
-        class="gps-status"
-    >
+    <!-- FEATURES SECTION -->
+    <section class="features">
+        <div class="section-header">
+            <h2>Mengapa Bergabung?</h2>
+            <p>Kami berfokus pada kolaborasi sehat dan dukungan moril di lapangan, bukan sekadar grup obrolan biasa.</p>
+        </div>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-satellite-dish"></i></div>
+                <h3>Informasi Area Terpusat</h3>
+                <p>Bagikan dan pantau kondisi lalu lintas, pembaruan rute, serta titik keramaian pesanan secara tertib dan transparan.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-hands-helping"></i></div>
+                <h3>Dukungan Lapangan</h3>
+                <p>Akses jaringan komunikasi darurat jika Anda mengalami kendala teknis pada kendaraan atau situasi mendesak lainnya saat bekerja.</p>
+            </div>
 
-        <span
-            id="gpsDot"
-            class="gps-dot"
-        ></span>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-users"></i></div>
+                <h3>Jejaring & Edukasi</h3>
+                <p>Ikuti sesi kopi darat (kopdar) terstruktur untuk membahas manajemen keuangan, perawatan kendaraan, hingga regulasi berlalu lintas.</p>
+            </div>
+        </div>
+    </section>
 
-        <span id="gpsText">
-            GPS belum aktif
-        </span>
+   <!-- CTA SECTION -->
+<section class="cta" id="cta">
+    <div class="cta-box">
+        <h2>Mari Bersama</h2>
 
-    </div>
+        <p>
+            Tingkatkan produktivitas kerja dan perluas jaringan pertemanan
+            bersama rekan-rekan seperjuangan di jalan.
+        </p>
 
-
-    <!-- MAP BUTTONS -->
-    <div class="map-controls">
-
-        <button
-            id="gpsButton"
-            class="map-button"
-            title="Lokasi saya"
+        <a
+            href="https://t.me/satuaspalindonesia"
+            class="btn-secondary"
+            target="_blank"
+            rel="noopener noreferrer"
         >
-            <span>⌾</span>
-        </button>
-
-
-        <button
-            id="addButton"
-            class="map-button add-button"
-            title="Tambah titik"
-        >
-            +
-        </button>
-
-    </div>
-
-
-    <!-- ADD POINT PANEL -->
-    <div
-        id="pointPanel"
-        class="point-panel hidden"
-    >
-
-        <div class="panel-header">
-
-            <div>
-                <h2>Tambah Titik</h2>
-
-                <p>
-                    Klik peta atau pilih hasil pencarian
-                </p>
-            </div>
-
-            <button
-                id="closePanel"
-                class="close-button"
-                type="button"
-            >
-                ×
-            </button>
-
-        </div>
-
-
-        <div class="form-group">
-
-            <label>
-                Nama lokasi
-            </label>
-
-            <input
-                id="pointName"
-                type="text"
-                placeholder="Contoh: Titik Driver A"
-            >
-
-        </div>
-
-
-        <div class="coordinate-row">
-
-            <div class="form-group">
-
-                <label>
-                    Latitude
-                </label>
-
-                <input
-                    id="pointLat"
-                    type="text"
-                    readonly
-                >
-
-            </div>
-
-
-            <div class="form-group">
-
-                <label>
-                    Longitude
-                </label>
-
-                <input
-                    id="pointLng"
-                    type="text"
-                    readonly
-                >
-
-            </div>
-
-        </div>
-
-
-        <div class="form-group">
-
-            <label>
-                Status
-            </label>
-
-            <select id="pointStatus">
-
-                <option value="Fiktif">
-                    Fiktif
-                </option>
-
-                <option value="Asli">
-                    Asli
-                </option>
-
-                <option value="Survey">
-                    Survey
-                </option>
-
-            </select>
-
-        </div>
-
-
-        <div class="form-group">
-
-            <label>
-                Keterangan
-            </label>
-
-            <textarea
-                id="pointDescription"
-                placeholder="Masukkan keterangan lokasi..."
-            ></textarea>
-
-        </div>
-
+            Gabung Grup Telegram
+        </a>
 
         <button
-            id="savePoint"
-            class="save-button"
             type="button"
+            class="telegram-info"
+            onclick="openTelegramModal()"
         >
-            Simpan Titik
+            Kenapa kita memilih Telegram? <i class="fas fa-arrow-right"></i>
+        </button>
+    </div>
+</section>
+
+
+<!-- TELEGRAM MODAL -->
+<div class="telegram-modal" id="telegramModal" aria-hidden="true">
+    <div class="telegram-modal-overlay" onclick="closeTelegramModal()"></div>
+
+    <div
+        class="telegram-modal-box"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="telegramModalTitle"
+    >
+        <button
+            type="button"
+            class="telegram-modal-close"
+            onclick="closeTelegramModal()"
+            aria-label="Tutup"
+        >
+            <i class="fas fa-times"></i>
         </button>
 
+        <div class="telegram-modal-icon">
+            <i class="fab fa-telegram-plane"></i>
+        </div>
+
+        <h3 id="telegramModalTitle">
+            Kenapa kita memilih Telegram?
+        </h3>
+
+        <p class="telegram-modal-intro">
+            SatuAspal memilih Telegram sebagai salah satu ruang utama
+            komunikasi komunitas karena lebih sesuai untuk membangun
+            komunitas yang terus berkembang.
+        </p>
+
+<div class="telegram-reason">
+                <div class="reason-icon">
+                    <i class="fas fa-handshake"></i>
+                </div>
+
+                <div>
+                    <h4>Kebebasan Berpendapat</h4>
+                    <p>
+Telegram memberikan privasi yang lebih baik karena nomor telepon disembunyikan dari anggota lain. Hal ini membuat anggota lebih nyaman menyampaikan keluhan, kritik terhadap aplikator, tanpa khawatir identitasnya mudah diketahui oleh aplikator yang terkait pelanggaran kode etik driver
+                    </p>
+                </div>
+            </div>
+
+        <div class="telegram-reasons">
+
+            <div class="telegram-reason">
+                <div class="reason-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+
+                <div>
+                    <h4>Komunitas Lebih Fleksibel</h4>
+                    <p>
+                     Memudahkan anggota bergabung dan berinteraksi tanpa terbatas pada satu platform ojol. Telegram mampu menampung puluhan ribu anggota dan memungkinkan satu komunitas memiliki banyak forum/topik chat untuk setiap platform driver.
+Gojek • Grab • Shopee • Maxim • Lalamove • inDrive
+                    </p>
+                </div>
+            </div>
+
+            <div class="telegram-reason">
+                <div class="reason-icon">
+                    <i class="fas fa-bullhorn"></i>
+                </div>
+
+                <div>
+                    <h4>Informasi Lebih Terarah</h4>
+                    <p>
+Informasi komunitas lebih rapi dan mudah ditemukan kembali karena Telegram mendukung pembagian topik dalam satu grup. Chat juga tersimpan di cloud, 
+sehingga tetap bisa diakses meskipun HP hilang atau berganti perangkat, termasuk chat lama.
+                    </p>
+                </div>
+            </div>
+
+            <div class="telegram-reason">
+                <div class="reason-icon">
+                    <i class="fas fa-photo-film"></i>
+                </div>
+
+                <div>
+                    <h4>Mudah Berbagi Informasi</h4>
+                    <p>
+                       Berbagi foto, video, dokumen, dan informasi lapangan lebih praktis. Telegram juga mampu menyimpan banyak video dan dokumen dengan kapasitas besar, serta pengaturan akses video lebih fleksibel dibandingkan WhatsApp yang memiliki keterbatasan penyimpanan cloud.
+                    </p>
+                </div>
+            </div>
+
+
+        </div>
+
+        <a
+            href="https://t.me/satuaspalindonesia"
+            class="telegram-modal-button"
+            target="_blank"
+            rel="noopener noreferrer"
+        >
+            Gabung SatuAspal
+            <i class="fas fa-arrow-right"></i>
+        </a>
+    </div>
+</div>
+
+    <!-- FOOTER -->
+<footer>
+    <div>&copy; 2027 Komunitas SatuAspal. Hak cipta dilindungi.</div>
+<div class="footer-social">
+    <div class="social-icons">
+        <a href="coomingsoon.html"><i class="fab fa-instagram"></i></a>
+        <a href="coomingsoon.html"><i class="fab fa-facebook"></i></a>
+        <a href="coomingsoon.html"><i class="fab fa-twitter"></i></a>
     </div>
 
+    <div class="footer-social-text">
+        Media sosial sebagai sarana edukasi pengguna layanan driver.
+    </div>
+</div>
+</footer>
 
-    <!--
-        script.js harus dimuat SEBELUM Google Maps.
-        Karena initMap dibuat di script.js.
-    -->
-
-    <script src="script.js"></script>
-
-
-    <!-- GOOGLE MAPS -->
-    <script
-        async
-        defer
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAjNVDmAvtF2iXae3Krb4dD603FbBt6UP8&libraries=places&callback=initMap">
+    <!-- JAVASCRIPT -->
+    <script>
+        function toggleMenu() {
+            const menu = document.getElementById('navMenu');
+            const icon = document.querySelector('.menu-toggle i');
+            
+            menu.classList.toggle('active');
+            
+            if(menu.classList.contains('active')) {
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-times');
+            } else {
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            }
+        }
     </script>
+   
+   
+   <script>
+    function openTelegramModal() {
+        const modal = document.getElementById('telegramModal');
 
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeTelegramModal() {
+        const modal = document.getElementById('telegramModal');
+
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden', 'true');
+
+        document.body.style.overflow = '';
+    }
+
+    // Tutup modal dengan tombol Escape
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            closeTelegramModal();
+        }
+    });
+</script>
 </body>
 </html>
