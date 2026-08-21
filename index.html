@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Driver Maps</title>
+
+
+    <!-- MAPLIBRE -->
+
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/maplibre-gl@5.6.2/dist/maplibre-gl.css"
+    />
+
+
+    <!-- GEOCODER -->
+
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/@maplibre/maplibre-gl-geocoder@1.14.0/dist/maplibre-gl-geocoder.css"
+    />
+
+
+    <!-- CSS -->
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    />
+
+</head>
+
+
+<body>
+
+
+    <!-- ==================================================
+         MAP
+    =================================================== -->
+
+    <div id="map"></div>
+
+
+    <!-- ==================================================
+         SEARCH
+    =================================================== -->
+
+    <div
+        id="search-box"
+        class="search-box"
+    ></div>
+
+
+    <!-- ==================================================
+         GPS STATUS
+    =================================================== -->
+
+    <div
+        id="gps-status"
+        class="gps-status"
+    >
+
+        <span id="gps-dot"></span>
+
+        <span id="gps-text">
+            GPS belum aktif
+        </span>
+
+    </div>
+
+
+    <!-- ==================================================
+         MAP CONTROLS
+    =================================================== -->
+
+    <div class="map-controls">
+
+
+        <button
+            id="location-btn"
+            title="Lokasi saya"
+        >
+            ◎
+        </button>
+
+
+        <button
+            id="route-btn"
+            title="Rute ke tujuan"
+        >
+            ➤
+        </button>
+
+
+        <button
+            id="add-btn"
+            title="Tambah titik"
+        >
+            +
+        </button>
+
+
+    </div>
+
+
+    <!-- ==================================================
+         ROUTE INFO
+    =================================================== -->
+
+    <div
+        id="route-card"
+        class="route-card hidden"
+    >
+
+        <button
+            id="close-route"
+            class="close-small"
+        >
+            ×
+        </button>
+
+
+        <div class="route-title">
+            Rute Driver
+        </div>
+
+
+        <div
+            id="route-distance"
+            class="route-value"
+        >
+            -
+        </div>
+
+
+        <div
+            id="route-time"
+            class="route-sub"
+        >
+            -
+        </div>
+
+    </div>
+
+
+    <!-- ==================================================
+         PLACE CARD
+    =================================================== -->
+
+    <div
+        id="place-card"
+        class="place-card hidden"
+    >
+
+        <button
+            id="close-place"
+            class="close-small"
+        >
+            ×
+        </button>
+
+
+        <div
+            id="place-name"
+            class="place-name"
+        >
+            -
+        </div>
+
+
+        <div
+            id="place-address"
+            class="place-address"
+        >
+            -
+        </div>
+
+
+        <div
+            id="place-coordinates"
+            class="coordinates"
+        >
+            -
+        </div>
+
+
+        <button
+            id="use-place-btn"
+            class="primary-btn"
+        >
+            Gunakan sebagai Tujuan
+        </button>
+
+
+        <button
+            id="save-place-btn"
+            class="secondary-btn"
+        >
+            Tambahkan sebagai Titik
+        </button>
+
+    </div>
+
+
+    <!-- ==================================================
+         ADD POINT PANEL
+    =================================================== -->
+
+    <div
+        id="point-panel"
+        class="point-panel hidden"
+    >
+
+        <div class="panel-header">
+
+            <h2>
+                Tambah Titik
+            </h2>
+
+
+            <button
+                id="close-panel"
+                class="close-small"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <div class="panel-info">
+
+            Klik lokasi di peta atau pilih
+            lokasi dari pencarian.
+
+        </div>
+
+
+        <label>
+            Nama Lokasi
+        </label>
+
+        <input
+            id="nama"
+            type="text"
+            placeholder="Contoh: Gudang A"
+        />
+
+
+        <label>
+            Latitude
+        </label>
+
+        <input
+            id="lat"
+            type="text"
+            readonly
+            placeholder="Klik peta"
+        />
+
+
+        <label>
+            Longitude
+        </label>
+
+        <input
+            id="lng"
+            type="text"
+            readonly
+            placeholder="Klik peta"
+        />
+
+
+        <label>
+            Status
+        </label>
+
+        <select id="status">
+
+            <option value="Fiktif">
+                Fiktif
+            </option>
+
+            <option value="Asli">
+                Asli
+            </option>
+
+            <option value="Survey">
+                Survey
+            </option>
+
+        </select>
+
+
+        <label>
+            Keterangan
+        </label>
+
+        <textarea
+            id="keterangan"
+            placeholder="Keterangan lokasi..."
+        ></textarea>
+
+
+        <button
+            id="save-point"
+            class="primary-btn"
+        >
+            Simpan Titik
+        </button>
+
+    </div>
+
+
+    <!-- ==================================================
+         LIBRARIES
+    =================================================== -->
+
+    <script
+        src="https://unpkg.com/maplibre-gl@5.6.2/dist/maplibre-gl.js"
+    ></script>
+
+
+    <script
+        src="https://unpkg.com/@maplibre/maplibre-gl-geocoder@1.14.0/dist/maplibre-gl-geocoder.min.js"
+    ></script>
+
+
+    <!-- ==================================================
+         APP
+    =================================================== -->
+
+    <script src="script.js"></script>
+
+
+</body>
+
+</html>
