@@ -1,102 +1,79 @@
-// =====================================================
-// GEOAPIFY DRIVER MAP
-// =====================================================
+/* =====================================================
+   GOOGLE MAPS
+===================================================== */
 
-const GEOAPIFY_API_KEY =
-    "4409fb031a5e49a191e1eacd8f40a26c";
+let map = null;
 
-
-const DEFAULT_CENTER = [
-    106.8456,
-    -6.2088
-];
-
-
-let map;
+let searchAutocomplete = null;
 
 let driverMarker = null;
 
-let driverAccuracySource = null;
-
 let selectedMarker = null;
 
-let destinationMarker = null;
-
-let destination = null;
-
-let selectedPlace = null;
+let selectedCoordinate = null;
 
 let gpsWatchId = null;
 
-let searchTimer = null;
 
+/* =====================================================
+   INIT MAP
 
-// =====================================================
-// INIT
-// =====================================================
+   Google Maps memanggil fungsi ini melalui:
+   callback=initMap
+===================================================== */
 
-function init() {
+window.initMap = function () {
 
-    map = new maplibregl.Map({
-
-        container: "map",
-
-        style:
-            `https://maps.geoapify.com/v1/styles/osm-bright/style.json?apiKey=${GEOAPIFY_API_KEY}`,
-
-        center:
-            DEFAULT_CENTER,
-
-        zoom:
-            12,
-
-        attributionControl:
-            true
-
-    });
-
-
-    map.addControl(
-
-        new maplibregl.NavigationControl(),
-
-        "bottom-right"
-
+    console.log(
+        "Google Maps berhasil dimuat."
     );
 
 
-    map.on(
-        "load",
-        () => {
+    map = new google.maps.Map(
 
-            setupSearch();
+        document.getElementById(
+            "map"
+        ),
 
-            setupMapClick();
+        {
 
-            setupButtons();
+            center: {
+
+                lat: -6.2088,
+
+                lng: 106.8456
+
+            },
+
+            zoom: 13,
+
+            mapTypeControl: false,
+
+            streetViewControl: false,
+
+            fullscreenControl: true,
+
+            clickableIcons: true
 
         }
+
     );
 
 
-    map.on(
-        "error",
-        event => {
+    setupSearch();
 
-            console.error(
-                "MAP ERROR:",
-                event
-            );
+    setupMapClick();
 
-        }
-    );
+    setupButtons();
 
-}
+    loadSavedPoints();
+
+};
 
 
-// =====================================================
-// SEARCH
-// =====================================================
+/* =====================================================
+   SEARCH GOOGLE MAPS
+===================================================== */
 
 function setupSearch() {
 
@@ -106,732 +83,435 @@ function setupSearch() {
         );
 
 
-    const clear =
-        document.getElementById(
-            "clearSearch"
+    /*
+       Google Places Autocomplete.
+
+       Ini yang membuat:
+       "jakarta"
+       "kalibata"
+       "mall"
+       "stasiun"
+       dll
+
+       menampilkan saran lokasi.
+    */
+
+    searchAutocomplete =
+        new google.maps.places.Autocomplete(
+
+            input,
+
+            {
+
+                fields: [
+
+                    "geometry",
+
+                    "name",
+
+                    "formatted_address",
+
+                    "place_id"
+
+                ]
+
+            }
+
         );
 
 
-    input.addEventListener(
-        "input",
-        () => {
-
-            const text =
-                input.value.trim();
+    searchAutocomplete.bindTo(
+        "bounds",
+        map
+    );
 
 
-            clear.style.display =
-                text
-                    ? "block"
-                    : "none";
+    searchAutocomplete.addListener(
 
+        "place_changed",
 
-            clearTimeout(
-                searchTimer
-            );
+        function () {
+
+            const place =
+                searchAutocomplete.getPlace();
 
 
             if (
-                text.length < 2
+                !place.geometry ||
+                !place.geometry.location
             ) {
 
-                hideSearchResults();
+                alert(
+                    "Lokasi tidak ditemukan."
+                );
 
                 return;
 
             }
 
 
-            searchTimer =
-                setTimeout(
-                    () => {
+            const location =
+                place.geometry.location;
 
-                        searchLocation(
-                            text
-                        );
 
-                    },
-                    350
-                );
+            const lat =
+                location.lat();
+
+
+            const lng =
+                location.lng();
+
+
+            console.log(
+                "Search:",
+                place.name,
+
+                lat,
+
+                lng
+            );
+
+
+            /*
+               Pindahkan map
+            */
+
+            map.panTo(
+                location
+            );
+
+
+            map.setZoom(
+                17
+            );
+
+
+            /*
+               Marker hasil search
+            */
+
+            showSelectedMarker(
+                lat,
+                lng
+            );
+
+
+            /*
+               Isi koordinat
+            */
+
+            setSelectedCoordinate(
+                lat,
+                lng
+            );
+
+
+            /*
+               Isi nama
+            */
+
+            document.getElementById(
+                "pointName"
+            ).value =
+                place.name || "";
+
+
+            /*
+               Buka panel
+            */
+
+            openPanel();
 
         }
-    );
 
-
-    clear.addEventListener(
-        "click",
-        () => {
-
-            input.value = "";
-
-            clear.style.display =
-                "none";
-
-            hideSearchResults();
-
-            input.focus();
-
-        }
-    );
-
-
-    input.addEventListener(
-        "keydown",
-        event => {
-
-            if (
-                event.key === "Enter"
-            ) {
-
-                const text =
-                    input.value.trim();
-
-
-                if (
-                    text
-                ) {
-
-                    searchLocation(
-                        text
-                    );
-
-                }
-
-            }
-
-        }
     );
 
 }
 
 
-// =====================================================
-// SEARCH API
-// =====================================================
+/* =====================================================
+   CLEAR SEARCH
+===================================================== */
 
-async function searchLocation(
-    query
-) {
+function clearSearch() {
 
-    showSearchLoading();
-
-
-    const params =
-        new URLSearchParams({
-
-            text:
-                query,
-
-            apiKey:
-                GEOAPIFY_API_KEY,
-
-            format:
-                "json",
-
-            limit:
-                "8",
-
-            lang:
-                "id",
-
-            filter:
-                "countrycode:id"
-
-        });
-
-
-    // Prioritaskan lokasi
-    // sekitar driver
-
-    if (
-        driverMarker
-    ) {
-
-        const pos =
-            driverMarker
-                .getLngLat();
-
-
-        params.set(
-
-            "bias",
-
-            `proximity:${pos.lng},${pos.lat}`
-
-        );
-
-    }
-
-
-    try {
-
-        const response =
-            await fetch(
-
-                `https://api.geoapify.com/v1/geocode/search?${params.toString()}`
-
-            );
-
-
-        if (
-            !response.ok
-        ) {
-
-            throw new Error(
-                "Geoapify search error"
-            );
-
-        }
-
-
-        const data =
-            await response.json();
-
-
-        showSearchResults(
-            data.results || []
-        );
-
-    }
-
-    catch (
-        error
-    ) {
-
-        console.error(
-            error
-        );
-
-
-        showSearchError();
-
-    }
-
-}
-
-
-// =====================================================
-// SEARCH RESULTS
-// =====================================================
-
-function showSearchResults(
-    results
-) {
-
-    const container =
+    const input =
         document.getElementById(
-            "searchResults"
+            "searchInput"
         );
 
 
-    container.innerHTML = "";
-
-
-    if (
-        !results.length
-    ) {
-
-        container.innerHTML = `
-
-            <div class="search-result">
-
-                <div class="result-name">
-                    Lokasi tidak ditemukan
-                </div>
-
-                <div class="result-address">
-                    Coba gunakan nama jalan,
-                    tempat, atau alamat yang lebih lengkap.
-                </div>
-
-            </div>
-
-        `;
-
-        return;
-
-    }
-
-
-    results.forEach(
-        result => {
-
-            const button =
-                document.createElement(
-                    "button"
-                );
-
-
-            button.className =
-                "search-result";
-
-
-            const name =
-                result.name ||
-                result.address_line1 ||
-                "Lokasi";
-
-
-            const address =
-                result.formatted ||
-                result.address_line2 ||
-                "";
-
-
-            button.innerHTML = `
-
-                <div class="result-name">
-                    ${escapeHTML(name)}
-                </div>
-
-                <div class="result-address">
-                    ${escapeHTML(address)}
-                </div>
-
-            `;
-
-
-            button.addEventListener(
-                "click",
-                () => {
-
-                    selectSearchResult(
-                        result
-                    );
-
-                }
-            );
-
-
-            container.appendChild(
-                button
-            );
-
-        }
-    );
-
-}
-
-
-function showSearchLoading() {
-
-    const container =
-        document.getElementById(
-            "searchResults"
-        );
-
-
-    container.innerHTML = `
-
-        <div class="search-result">
-
-            <div class="result-name">
-                Mencari...
-            </div>
-
-        </div>
-
-    `;
-
-}
-
-
-function showSearchError() {
-
-    const container =
-        document.getElementById(
-            "searchResults"
-        );
-
-
-    container.innerHTML = `
-
-        <div class="search-result">
-
-            <div class="result-name">
-                Gagal mencari lokasi
-            </div>
-
-            <div class="result-address">
-                Periksa API key dan koneksi internet.
-            </div>
-
-        </div>
-
-    `;
-
-}
-
-
-function hideSearchResults() {
-
-    document.getElementById(
-        "searchResults"
-    ).innerHTML = "";
-
-}
-
-
-// =====================================================
-// SELECT SEARCH RESULT
-// =====================================================
-
-function selectSearchResult(
-    result
-) {
-
-    const lat =
-        Number(
-            result.lat
-        );
-
-
-    const lng =
-        Number(
-            result.lon
-        );
-
-
-    selectedPlace = {
-
-        name:
-            result.name ||
-            result.address_line1 ||
-            "Lokasi",
-
-        address:
-            result.formatted ||
-            "",
-
-        lat,
-
-        lng
-
-    };
-
-
-    map.flyTo({
-
-        center: [
-            lng,
-            lat
-        ],
-
-        zoom:
-            17,
-
-        duration:
-            1000
-
-    });
+    input.value = "";
 
 
     if (
         selectedMarker
     ) {
 
-        selectedMarker.remove();
+        selectedMarker.setMap(
+            null
+        );
+
+        selectedMarker = null;
 
     }
 
-
-    selectedMarker =
-        createMarker(
-
-            lng,
-            lat,
-
-            "#ef4444"
-
-        );
-
-
-    showPlaceCard(
-        selectedPlace
-    );
-
-
-    hideSearchResults();
-
-
-    document.getElementById(
-        "searchInput"
-    ).blur();
-
 }
 
 
-// =====================================================
-// PLACE CARD
-// =====================================================
+document.addEventListener(
 
-function showPlaceCard(
-    place
-) {
+    "DOMContentLoaded",
 
-    document.getElementById(
-        "placeName"
-    ).textContent =
-        place.name;
+    function () {
 
+        document
+            .getElementById(
+                "clearSearch"
+            )
+            .addEventListener(
+                "click",
+                clearSearch
+            );
 
-    document.getElementById(
-        "placeAddress"
-    ).textContent =
-        place.address;
+    }
 
-
-    document.getElementById(
-        "placeCoordinates"
-    ).textContent =
-
-        `${place.lat.toFixed(6)}, ${place.lng.toFixed(6)}`;
+);
 
 
-    document.getElementById(
-        "placeCard"
-    ).classList.remove(
-        "hidden"
-    );
-
-}
-
-
-function hidePlaceCard() {
-
-    document.getElementById(
-        "placeCard"
-    ).classList.add(
-        "hidden"
-    );
-
-}
-
-
-// =====================================================
-// MAP CLICK
-// =====================================================
+/* =====================================================
+   CLICK MAP
+===================================================== */
 
 function setupMapClick() {
 
-    map.on(
+    map.addListener(
+
         "click",
-        async event => {
+
+        function (event) {
 
             const lat =
-                event.lngLat.lat;
+                event.latLng.lat();
+
 
             const lng =
-                event.lngLat.lng;
+                event.latLng.lng();
 
 
-            openPointPanel(
+            console.log(
+                "Map click:",
                 lat,
                 lng
             );
 
+
+            setSelectedCoordinate(
+                lat,
+                lng
+            );
+
+
+            showSelectedMarker(
+                lat,
+                lng
+            );
+
+
+            /*
+               Coba mendapatkan alamat
+               berdasarkan koordinat.
+            */
 
             reverseGeocode(
                 lat,
                 lng
             );
 
+
+            openPanel();
+
         }
+
     );
 
 }
 
 
-// =====================================================
-// REVERSE GEOCODING
-// =====================================================
+/* =====================================================
+   SELECT COORDINATE
+===================================================== */
 
-async function reverseGeocode(
+function setSelectedCoordinate(
     lat,
     lng
 ) {
 
-    try {
+    selectedCoordinate = {
 
-        const params =
-            new URLSearchParams({
+        lat: Number(lat),
 
-                lat,
+        lng: Number(lng)
 
-                lon:
-                    lng,
+    };
 
-                apiKey:
-                    GEOAPIFY_API_KEY,
-
-                lang:
-                    "id"
-
-            });
-
-
-        const response =
-            await fetch(
-
-                `https://api.geoapify.com/v1/geocode/reverse?${params.toString()}`
-
-            );
-
-
-        if (
-            !response.ok
-        ) {
-
-            return;
-
-        }
-
-
-        const data =
-            await response.json();
-
-
-        if (
-            data.features &&
-            data.features.length
-        ) {
-
-            const result =
-                data.features[0].properties;
-
-
-            document.getElementById(
-                "pointName"
-            ).value =
-
-                result.name ||
-                result.address_line1 ||
-                "Lokasi Baru";
-
-        }
-
-    }
-
-    catch (
-        error
-    ) {
-
-        console.error(
-            error
-        );
-
-    }
-
-}
-
-
-// =====================================================
-// OPEN POINT PANEL
-// =====================================================
-
-function openPointPanel(
-    lat,
-    lng
-) {
 
     document.getElementById(
         "pointLat"
     ).value =
-        lat.toFixed(6);
+        Number(lat).toFixed(6);
 
 
     document.getElementById(
         "pointLng"
     ).value =
-        lng.toFixed(6);
+        Number(lng).toFixed(6);
+
+}
 
 
-    document.getElementById(
-        "pointPanel"
-    ).classList.remove(
-        "hidden"
-    );
+/* =====================================================
+   TEMP MARKER
+===================================================== */
 
+function showSelectedMarker(
+    lat,
+    lng
+) {
 
     if (
         selectedMarker
     ) {
 
-        selectedMarker.remove();
+        selectedMarker.setMap(
+            null
+        );
 
     }
 
 
     selectedMarker =
-        createMarker(
+        new google.maps.Marker({
 
-            lng,
-            lat,
+            position: {
 
-            "#2563eb"
+                lat,
 
-        );
+                lng
+
+            },
+
+            map,
+
+            animation:
+                google.maps.Animation.DROP,
+
+            title:
+                "Lokasi dipilih"
+
+        });
 
 }
 
 
-// =====================================================
-// CREATE MARKER
-// =====================================================
+/* =====================================================
+   REVERSE GEOCODING
+===================================================== */
 
-function createMarker(
-    lng,
+function reverseGeocode(
     lat,
-    color
+    lng
 ) {
 
-    const element =
-        document.createElement(
-            "div"
-        );
+    /*
+       Geocoder hanya digunakan
+       ketika user klik peta.
+    */
+
+    const geocoder =
+        new google.maps.Geocoder();
 
 
-    element.style.width =
-        "24px";
+    geocoder.geocode(
 
-    element.style.height =
-        "24px";
+        {
 
-    element.style.borderRadius =
-        "50%";
+            location: {
 
-    element.style.background =
-        color;
+                lat,
 
-    element.style.border =
-        "4px solid white";
+                lng
 
-    element.style.boxShadow =
-        "0 2px 10px rgba(0,0,0,.35)";
+            }
+
+        },
+
+        function (
+            results,
+            status
+        ) {
+
+            if (
+                status !==
+                "OK"
+            ) {
+
+                console.log(
+                    "Geocoder:",
+                    status
+                );
+
+                return;
+
+            }
 
 
-    return new maplibregl.Marker({
+            if (
+                !results ||
+                !results.length
+            ) {
 
-        element,
+                return;
 
-        anchor:
-            "center"
+            }
 
-    })
 
-    .setLngLat([
-        lng,
-        lat
-    ])
+            const address =
+                results[0]
+                    .formatted_address;
 
-    .addTo(map);
+
+            const nameInput =
+                document.getElementById(
+                    "pointName"
+                );
+
+
+            /*
+               Jangan menimpa nama
+               jika user sudah memilih
+               hasil search.
+            */
+
+            if (
+                !nameInput.value.trim()
+            ) {
+
+                nameInput.value =
+                    address;
+
+            }
+
+        }
+
+    );
 
 }
 
 
-// =====================================================
-// GPS
-// =====================================================
+/* =====================================================
+   GPS
+===================================================== */
 
 function startGPS() {
 
@@ -840,7 +520,7 @@ function startGPS() {
     ) {
 
         setGPSStatus(
-            "GPS tidak didukung browser",
+            "Browser tidak mendukung GPS",
             false
         );
 
@@ -850,89 +530,64 @@ function startGPS() {
 
 
     setGPSStatus(
-        "Meminta izin GPS...",
+        "Mencari posisi...",
         false
     );
 
 
     navigator.geolocation.getCurrentPosition(
 
-        position => {
+        function (position) {
 
             updateDriverPosition(
                 position
             );
 
 
-            map.flyTo({
+            /*
+               Pindahkan map ke posisi HP.
+            */
 
-                center: [
+            map.panTo({
 
-                    position.coords.longitude,
+                lat:
+                    position.coords.latitude,
 
-                    position.coords.latitude
-
-                ],
-
-                zoom:
-                    17,
-
-                duration:
-                    1000
+                lng:
+                    position.coords.longitude
 
             });
 
+
+            map.setZoom(
+                17
+            );
+
+
+            /*
+               Setelah mendapatkan
+               posisi pertama, mulai tracking.
+            */
 
             startGPSWatch();
 
         },
 
-        error => {
+
+        function (error) {
 
             console.error(
-                "GPS ERROR",
+                "GPS error:",
                 error
             );
 
 
-            if (
-                error.code === 1
-            ) {
-
-                setGPSStatus(
-                    "Izin GPS ditolak",
-                    false
-                );
-
-                alert(
-                    "Izin lokasi ditolak. Silakan izinkan lokasi untuk website ini di pengaturan browser."
-                );
-
-            }
-
-            else if (
-                error.code === 2
-            ) {
-
-                setGPSStatus(
-                    "Lokasi tidak tersedia",
-                    false
-                );
-
-            }
-
-            else if (
-                error.code === 3
-            ) {
-
-                setGPSStatus(
-                    "GPS timeout",
-                    false
-                );
-
-            }
+            handleGPSError(
+                error
+            );
 
         },
+
 
         {
 
@@ -952,9 +607,9 @@ function startGPS() {
 }
 
 
-// =====================================================
-// WATCH GPS
-// =====================================================
+/* =====================================================
+   GPS WATCH
+===================================================== */
 
 function startGPSWatch() {
 
@@ -972,7 +627,7 @@ function startGPSWatch() {
     gpsWatchId =
         navigator.geolocation.watchPosition(
 
-            position => {
+            function (position) {
 
                 updateDriverPosition(
                     position
@@ -980,9 +635,10 @@ function startGPSWatch() {
 
             },
 
-            error => {
+            function (error) {
 
                 console.error(
+                    "GPS watch error:",
                     error
                 );
 
@@ -993,11 +649,11 @@ function startGPSWatch() {
                 enableHighAccuracy:
                     true,
 
-                timeout:
-                    20000,
-
                 maximumAge:
-                    2000
+                    2000,
+
+                timeout:
+                    20000
 
             }
 
@@ -1006,9 +662,9 @@ function startGPSWatch() {
 }
 
 
-// =====================================================
-// UPDATE DRIVER
-// =====================================================
+/* =====================================================
+   UPDATE DRIVER MARKER
+===================================================== */
 
 function updateDriverPosition(
     position
@@ -1017,11 +673,42 @@ function updateDriverPosition(
     const lat =
         position.coords.latitude;
 
+
     const lng =
         position.coords.longitude;
 
+
     const accuracy =
-        position.coords.accuracy;
+        Math.round(
+            position.coords.accuracy
+        );
+
+
+    const location = {
+
+        lat,
+
+        lng
+
+    };
+
+
+    console.log(
+        "GPS:",
+        lat,
+        lng,
+        "accuracy:",
+        accuracy
+    );
+
+
+    setGPSStatus(
+
+        `GPS aktif • ±${accuracy} m`,
+
+        true
+
+    );
 
 
     if (
@@ -1029,233 +716,159 @@ function updateDriverPosition(
     ) {
 
         driverMarker =
-            createDriverMarker(
-                lng,
-                lat
-            );
+            new google.maps.Marker({
+
+                position:
+                    location,
+
+                map,
+
+                title:
+                    "Posisi saya",
+
+                icon: {
+
+                    path:
+                        google.maps.SymbolPath.CIRCLE,
+
+                    scale:
+                        9,
+
+                    fillColor:
+                        "#4285F4",
+
+                    fillOpacity:
+                        1,
+
+                    strokeColor:
+                        "#FFFFFF",
+
+                    strokeWeight:
+                        3
+
+                }
+
+            });
 
     }
 
     else {
 
-        driverMarker
-            .setLngLat([
-                lng,
-                lat
-            ]);
+        driverMarker.setPosition(
+            location
+        );
 
     }
 
-
-    setGPSStatus(
-
-        `GPS aktif • ±${Math.round(accuracy)} m`,
-
-        true
-
-    );
-
-
-    updateAccuracy(
-        lat,
-        lng
-    );
-
 }
 
 
-// =====================================================
-// DRIVER MARKER
-// =====================================================
+/* =====================================================
+   GPS ERROR
+===================================================== */
 
-function createDriverMarker(
-    lng,
-    lat
+function handleGPSError(
+    error
 ) {
 
-    const element =
-        document.createElement(
-            "div"
-        );
-
-
-    element.style.width =
-        "22px";
-
-    element.style.height =
-        "22px";
-
-    element.style.borderRadius =
-        "50%";
-
-    element.style.background =
-        "#4285f4";
-
-    element.style.border =
-        "4px solid white";
-
-    element.style.boxShadow =
-        "0 2px 10px rgba(0,0,0,.35)";
-
-
-    return new maplibregl.Marker({
-
-        element,
-
-        anchor:
-            "center"
-
-    })
-
-    .setLngLat([
-        lng,
-        lat
-    ])
-
-    .addTo(map);
-
-}
-
-
-// =====================================================
-// GPS ACCURACY
-// =====================================================
-
-function updateAccuracy(
-    lat,
-    lng
-) {
-
-    const sourceId =
-        "gps-position";
-
-
-    const data = {
-
-        type:
-            "Feature",
-
-        geometry: {
-
-            type:
-                "Point",
-
-            coordinates: [
-                lng,
-                lat
-            ]
-
-        }
-
-    };
-
-
-    if (
-        map.getSource(
-            sourceId
-        )
+    switch (
+        error.code
     ) {
 
-        map.getSource(
-            sourceId
-        ).setData(
-            data
-        );
+        case 1:
 
-        return;
+            setGPSStatus(
+                "Izin GPS ditolak",
+                false
+            );
+
+            alert(
+                "Akses lokasi ditolak.\n\n" +
+                "Silakan izinkan lokasi untuk website ini di browser."
+            );
+
+            break;
+
+
+        case 2:
+
+            setGPSStatus(
+                "Lokasi tidak tersedia",
+                false
+            );
+
+            alert(
+                "HP tidak berhasil mendapatkan lokasi."
+            );
+
+            break;
+
+
+        case 3:
+
+            setGPSStatus(
+                "GPS timeout",
+                false
+            );
+
+            alert(
+                "GPS terlalu lama mendapatkan lokasi."
+            );
+
+            break;
+
+
+        default:
+
+            setGPSStatus(
+                "GPS gagal",
+                false
+            );
 
     }
-
-
-    map.addSource(
-
-        sourceId,
-
-        {
-
-            type:
-                "geojson",
-
-            data
-
-        }
-
-    );
-
-
-    map.addLayer({
-
-        id:
-            "gps-accuracy",
-
-        type:
-            "circle",
-
-        source:
-            sourceId,
-
-        paint: {
-
-            "circle-radius":
-                25,
-
-            "circle-color":
-                "#4285f4",
-
-            "circle-opacity":
-                0.10,
-
-            "circle-stroke-color":
-                "#4285f4",
-
-            "circle-stroke-opacity":
-                0.25,
-
-            "circle-stroke-width":
-                1
-
-        }
-
-    });
 
 }
 
 
-// =====================================================
-// GPS STATUS
-// =====================================================
+/* =====================================================
+   GPS STATUS
+===================================================== */
 
 function setGPSStatus(
     text,
     active
 ) {
 
-    document.getElementById(
-        "gpsText"
-    ).textContent =
-        text;
+    const textElement =
+        document.getElementById(
+            "gpsText"
+        );
 
 
-    const status =
+    const statusElement =
         document.getElementById(
             "gpsStatus"
         );
+
+
+    textElement.textContent =
+        text;
 
 
     if (
         active
     ) {
 
-        status.classList.add(
-            "active"
+        statusElement.classList.add(
+            "gps-active"
         );
 
     }
 
     else {
 
-        status.classList.remove(
-            "active"
+        statusElement.classList.remove(
+            "gps-active"
         );
 
     }
@@ -1263,199 +876,136 @@ function setGPSStatus(
 }
 
 
-// =====================================================
-// BUTTONS
-// =====================================================
+/* =====================================================
+   BUTTON SETUP
+===================================================== */
 
 function setupButtons() {
 
-    document.getElementById(
-        "gpsButton"
-    ).addEventListener(
-        "click",
-        startGPS
-    );
+    document
+        .getElementById(
+            "gpsButton"
+        )
+        .addEventListener(
 
+            "click",
 
-    document.getElementById(
-        "addButton"
-    ).addEventListener(
-        "click",
-        () => {
+            function () {
 
-            document.getElementById(
-                "pointPanel"
-            ).classList.remove(
-                "hidden"
-            );
+                startGPS();
 
-        }
-    );
-
-
-    document.getElementById(
-        "closePanel"
-    ).addEventListener(
-        "click",
-        closePointPanel
-    );
-
-
-    document.getElementById(
-        "closePlace"
-    ).addEventListener(
-        "click",
-        hidePlaceCard
-    );
-
-
-    document.getElementById(
-        "destinationButton"
-    ).addEventListener(
-        "click",
-        setDestination
-    );
-
-
-    document.getElementById(
-        "saveLocationButton"
-    ).addEventListener(
-        "click",
-        saveSearchLocation
-    );
-
-
-    document.getElementById(
-        "savePoint"
-    ).addEventListener(
-        "click",
-        savePoint
-    );
-
-}
-
-
-// =====================================================
-// SET DESTINATION
-// =====================================================
-
-function setDestination() {
-
-    if (
-        !selectedPlace
-    ) {
-
-        return;
-
-    }
-
-
-    destination =
-        selectedPlace;
-
-
-    if (
-        destinationMarker
-    ) {
-
-        destinationMarker.remove();
-
-    }
-
-
-    destinationMarker =
-        createMarker(
-
-            destination.lng,
-
-            destination.lat,
-
-            "#16a34a"
+            }
 
         );
 
 
-    hidePlaceCard();
+    document
+        .getElementById(
+            "addButton"
+        )
+        .addEventListener(
+
+            "click",
+
+            function () {
+
+                openPanel();
+
+            }
+
+        );
 
 
-    alert(
-        "Tujuan berhasil dipilih."
-    );
+    document
+        .getElementById(
+            "closePanel"
+        )
+        .addEventListener(
+
+            "click",
+
+            function () {
+
+                closePanel();
+
+            }
+
+        );
+
+
+    document
+        .getElementById(
+            "savePoint"
+        )
+        .addEventListener(
+
+            "click",
+
+            function () {
+
+                savePoint();
+
+            }
+
+        );
 
 }
 
 
-// =====================================================
-// SAVE SEARCH LOCATION
-// =====================================================
+/* =====================================================
+   PANEL
+===================================================== */
 
-function saveSearchLocation() {
+function openPanel() {
+
+    document
+        .getElementById(
+            "pointPanel"
+        )
+        .classList.remove(
+            "hidden"
+        );
+
+}
+
+
+function closePanel() {
+
+    document
+        .getElementById(
+            "pointPanel"
+        )
+        .classList.add(
+            "hidden"
+        );
+
+}
+
+
+/* =====================================================
+   SAVE POINT
+===================================================== */
+
+function savePoint() {
 
     if (
-        !selectedPlace
+        !selectedCoordinate
     ) {
+
+        alert(
+            "Pilih lokasi terlebih dahulu.\n\n" +
+            "Bisa dengan klik peta atau cari lokasi."
+        );
 
         return;
 
     }
 
-
-    document.getElementById(
-        "pointName"
-    ).value =
-        selectedPlace.name;
-
-
-    document.getElementById(
-        "pointLat"
-    ).value =
-        selectedPlace.lat.toFixed(6);
-
-
-    document.getElementById(
-        "pointLng"
-    ).value =
-        selectedPlace.lng.toFixed(6);
-
-
-    document.getElementById(
-        "pointPanel"
-    ).classList.remove(
-        "hidden"
-    );
-
-
-    hidePlaceCard();
-
-}
-
-
-// =====================================================
-// SAVE POINT
-// =====================================================
-
-function savePoint() {
 
     const name =
         document.getElementById(
             "pointName"
         ).value.trim();
-
-
-    const lat =
-        Number(
-            document.getElementById(
-                "pointLat"
-            ).value
-        );
-
-
-    const lng =
-        Number(
-            document.getElementById(
-                "pointLng"
-            ).value
-        );
 
 
     const status =
@@ -1483,20 +1033,6 @@ function savePoint() {
     }
 
 
-    if (
-        !Number.isFinite(lat) ||
-        !Number.isFinite(lng)
-    ) {
-
-        alert(
-            "Koordinat belum dipilih."
-        );
-
-        return;
-
-    }
-
-
     const point = {
 
         id:
@@ -1504,13 +1040,18 @@ function savePoint() {
 
         name,
 
-        lat,
+        latitude:
+            selectedCoordinate.lat,
 
-        lng,
+        longitude:
+            selectedCoordinate.lng,
 
         status,
 
-        description
+        description,
+
+        createdAt:
+            new Date().toISOString()
 
     };
 
@@ -1519,7 +1060,7 @@ function savePoint() {
         JSON.parse(
 
             localStorage.getItem(
-                "driverPoints"
+                "ojol_points"
             ) || "[]"
 
         );
@@ -1532,7 +1073,7 @@ function savePoint() {
 
     localStorage.setItem(
 
-        "driverPoints",
+        "ojol_points",
 
         JSON.stringify(
             points
@@ -1541,12 +1082,15 @@ function savePoint() {
     );
 
 
-    addSavedPoint(
+    createSavedMarker(
         point
     );
 
 
-    closePointPanel();
+    closePanel();
+
+
+    clearPointForm();
 
 
     alert(
@@ -1556,115 +1100,260 @@ function savePoint() {
 }
 
 
-// =====================================================
-// ADD SAVED POINT
-// =====================================================
+/* =====================================================
+   CREATE SAVED MARKER
+===================================================== */
 
-function addSavedPoint(
+function createSavedMarker(
     point
 ) {
 
-    let color =
-        "#ef4444";
+    let markerColor =
+        "#EA4335";
 
 
     if (
-        point.status === "Asli"
+        point.status ===
+        "Asli"
     ) {
 
-        color =
-            "#22c55e";
+        markerColor =
+            "#34A853";
 
     }
 
 
     if (
-        point.status === "Survey"
+        point.status ===
+        "Survey"
     ) {
 
-        color =
-            "#3b82f6";
+        markerColor =
+            "#4285F4";
 
     }
 
 
     const marker =
-        createMarker(
+        new google.maps.Marker({
 
-            point.lng,
+            position: {
 
-            point.lat,
+                lat:
+                    Number(
+                        point.latitude
+                    ),
 
-            color
+                lng:
+                    Number(
+                        point.longitude
+                    )
+
+            },
+
+            map,
+
+            title:
+                point.name,
+
+            icon: {
+
+                path:
+                    google.maps.SymbolPath.CIRCLE,
+
+                scale:
+                    9,
+
+                fillColor:
+                    markerColor,
+
+                fillOpacity:
+                    1,
+
+                strokeColor:
+                    "#FFFFFF",
+
+                strokeWeight:
+                    3
+
+            }
+
+        });
+
+
+    const info =
+        new google.maps.InfoWindow({
+
+            content: `
+
+                <div style="
+                    min-width:220px;
+                    font-family:Arial;
+                    line-height:1.5;
+                ">
+
+                    <div style="
+                        font-size:16px;
+                        font-weight:bold;
+                        margin-bottom:8px;
+                    ">
+                        ${escapeHTML(
+                            point.name
+                        )}
+                    </div>
+
+
+                    <div>
+                        <b>Status:</b>
+                        ${escapeHTML(
+                            point.status
+                        )}
+                    </div>
+
+
+                    <div>
+                        <b>Latitude:</b>
+                        ${Number(
+                            point.latitude
+                        ).toFixed(6)}
+                    </div>
+
+
+                    <div>
+                        <b>Longitude:</b>
+                        ${Number(
+                            point.longitude
+                        ).toFixed(6)}
+                    </div>
+
+
+                    ${
+                        point.description
+                        ?
+
+                        `
+
+                        <div style="
+                            margin-top:8px;
+                        ">
+
+                            <b>
+                                Keterangan:
+                            </b>
+
+                            <br>
+
+                            ${escapeHTML(
+                                point.description
+                            )}
+
+                        </div>
+
+                        `
+
+                        :
+
+                        ""
+
+                    }
+
+                </div>
+
+            `
+
+        });
+
+
+    marker.addListener(
+
+        "click",
+
+        function () {
+
+            info.open(
+                map,
+                marker
+            );
+
+        }
+
+    );
+
+}
+
+
+/* =====================================================
+   LOAD SAVED POINTS
+===================================================== */
+
+function loadSavedPoints() {
+
+    const points =
+        JSON.parse(
+
+            localStorage.getItem(
+                "ojol_points"
+            ) || "[]"
 
         );
 
 
-    marker.setPopup(
+    console.log(
+        "Titik tersimpan:",
+        points.length
+    );
 
-        new maplibregl.Popup({
-            offset: 15
-        })
 
-        .setHTML(`
+    points.forEach(
 
-            <strong>
-                ${escapeHTML(point.name)}
-            </strong>
+        function (point) {
 
-            <br><br>
+            createSavedMarker(
+                point
+            );
 
-            <b>Status:</b>
-            ${escapeHTML(point.status)}
-
-            <br>
-
-            <b>Koordinat:</b>
-
-            ${point.lat.toFixed(6)},
-            ${point.lng.toFixed(6)}
-
-            ${
-                point.description
-                ?
-                `
-                <br><br>
-
-                <b>Keterangan:</b>
-
-                <br>
-
-                ${escapeHTML(point.description)}
-                `
-                :
-                ""
-            }
-
-        `)
+        }
 
     );
 
 }
 
 
-// =====================================================
-// CLOSE PANEL
-// =====================================================
+/* =====================================================
+   CLEAR FORM
+===================================================== */
 
-function closePointPanel() {
+function clearPointForm() {
 
     document.getElementById(
-        "pointPanel"
-    ).classList.add(
-        "hidden"
-    );
+        "pointName"
+    ).value = "";
+
+
+    document.getElementById(
+        "pointLat"
+    ).value = "";
+
+
+    document.getElementById(
+        "pointLng"
+    ).value = "";
+
+
+    document.getElementById(
+        "pointDescription"
+    ).value = "";
+
+
+    selectedCoordinate =
+        null;
 
 }
 
 
-// =====================================================
-// ESCAPE HTML
-// =====================================================
+/* =====================================================
+   ESCAPE HTML
+===================================================== */
 
 function escapeHTML(
     text
@@ -1698,13 +1387,3 @@ function escapeHTML(
         );
 
 }
-
-
-// =====================================================
-// START
-// =====================================================
-
-window.addEventListener(
-    "load",
-    init
-);
