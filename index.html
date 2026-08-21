@@ -1,346 +1,195 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
     <title>Driver Maps</title>
-
-
-    <!-- MAPLIBRE -->
 
     <link
         rel="stylesheet"
         href="https://unpkg.com/maplibre-gl@5.6.2/dist/maplibre-gl.css"
-    />
+    >
 
-
-    <!-- GEOCODER -->
-
-    <link
-        rel="stylesheet"
-        href="https://unpkg.com/@maplibre/maplibre-gl-geocoder@1.14.0/dist/maplibre-gl-geocoder.css"
-    />
-
-
-    <!-- CSS -->
-
-    <link
-        rel="stylesheet"
-        href="style.css"
-    />
-
+    <link rel="stylesheet" href="style.css">
 </head>
-
 
 <body>
 
+<div id="map"></div>
 
-    <!-- ==================================================
-         MAP
-    =================================================== -->
+<!-- SEARCH -->
+<div class="search-container">
 
-    <div id="map"></div>
+    <div class="search-box">
 
+        <span class="search-icon">⌕</span>
 
-    <!-- ==================================================
-         SEARCH
-    =================================================== -->
+        <input
+            id="searchInput"
+            type="search"
+            placeholder="Cari lokasi, alamat, tempat..."
+            autocomplete="off"
+        >
 
-    <div
-        id="search-box"
-        class="search-box"
-    ></div>
-
-
-    <!-- ==================================================
-         GPS STATUS
-    =================================================== -->
-
-    <div
-        id="gps-status"
-        class="gps-status"
-    >
-
-        <span id="gps-dot"></span>
-
-        <span id="gps-text">
-            GPS belum aktif
-        </span>
+        <button id="clearSearch" class="clear-btn">×</button>
 
     </div>
 
+    <div id="searchResults" class="search-results"></div>
 
-    <!-- ==================================================
-         MAP CONTROLS
-    =================================================== -->
-
-    <div class="map-controls">
+</div>
 
 
-        <button
-            id="location-btn"
-            title="Lokasi saya"
-        >
-            ◎
-        </button>
+<!-- GPS STATUS -->
+<div id="gpsStatus" class="gps-status">
+    <span id="gpsDot"></span>
+    <span id="gpsText">GPS belum aktif</span>
+</div>
 
 
-        <button
-            id="route-btn"
-            title="Rute ke tujuan"
-        >
-            ➤
-        </button>
+<!-- MAP BUTTONS -->
+<div class="map-buttons">
+
+    <button id="gpsButton" class="map-button" title="Lokasi saya">
+        ◎
+    </button>
+
+    <button id="addButton" class="map-button add-button" title="Tambah titik">
+        +
+    </button>
+
+</div>
 
 
-        <button
-            id="add-btn"
-            title="Tambah titik"
-        >
-            +
-        </button>
+<!-- PLACE INFO -->
+<div id="placeCard" class="place-card hidden">
 
+    <button id="closePlace" class="close-button">
+        ×
+    </button>
 
+    <div id="placeName" class="place-name">
+        -
     </div>
 
+    <div id="placeAddress" class="place-address">
+        -
+    </div>
 
-    <!-- ==================================================
-         ROUTE INFO
-    =================================================== -->
+    <div id="placeCoordinates" class="coordinates">
+        -
+    </div>
 
-    <div
-        id="route-card"
-        class="route-card hidden"
-    >
+    <button id="destinationButton" class="primary-button">
+        Jadikan Tujuan
+    </button>
 
-        <button
-            id="close-route"
-            class="close-small"
-        >
+    <button id="saveLocationButton" class="secondary-button">
+        Simpan Titik
+    </button>
+
+</div>
+
+
+<!-- ADD POINT -->
+<div id="pointPanel" class="point-panel hidden">
+
+    <div class="panel-header">
+
+        <strong>Tambah Titik</strong>
+
+        <button id="closePanel" class="close-button">
             ×
         </button>
 
-
-        <div class="route-title">
-            Rute Driver
-        </div>
-
-
-        <div
-            id="route-distance"
-            class="route-value"
-        >
-            -
-        </div>
-
-
-        <div
-            id="route-time"
-            class="route-sub"
-        >
-            -
-        </div>
-
     </div>
 
+    <p class="hint">
+        Klik pada peta untuk menentukan koordinat.
+    </p>
 
-    <!-- ==================================================
-         PLACE CARD
-    =================================================== -->
+    <label>Nama</label>
 
-    <div
-        id="place-card"
-        class="place-card hidden"
+    <input
+        id="pointName"
+        type="text"
+        placeholder="Nama lokasi"
     >
 
-        <button
-            id="close-place"
-            class="close-small"
-        >
-            ×
-        </button>
+    <label>Latitude</label>
 
-
-        <div
-            id="place-name"
-            class="place-name"
-        >
-            -
-        </div>
-
-
-        <div
-            id="place-address"
-            class="place-address"
-        >
-            -
-        </div>
-
-
-        <div
-            id="place-coordinates"
-            class="coordinates"
-        >
-            -
-        </div>
-
-
-        <button
-            id="use-place-btn"
-            class="primary-btn"
-        >
-            Gunakan sebagai Tujuan
-        </button>
-
-
-        <button
-            id="save-place-btn"
-            class="secondary-btn"
-        >
-            Tambahkan sebagai Titik
-        </button>
-
-    </div>
-
-
-    <!-- ==================================================
-         ADD POINT PANEL
-    =================================================== -->
-
-    <div
-        id="point-panel"
-        class="point-panel hidden"
+    <input
+        id="pointLat"
+        type="text"
+        readonly
     >
 
-        <div class="panel-header">
+    <label>Longitude</label>
 
-            <h2>
-                Tambah Titik
-            </h2>
+    <input
+        id="pointLng"
+        type="text"
+        readonly
+    >
 
+    <label>Status</label>
 
-            <button
-                id="close-panel"
-                class="close-small"
-            >
-                ×
-            </button>
+    <select id="pointStatus">
 
-        </div>
+        <option value="Fiktif">
+            Fiktif
+        </option>
 
+        <option value="Asli">
+            Asli
+        </option>
 
-        <div class="panel-info">
+        <option value="Survey">
+            Survey
+        </option>
 
-            Klik lokasi di peta atau pilih
-            lokasi dari pencarian.
+    </select>
 
-        </div>
+    <label>Keterangan</label>
 
+    <textarea
+        id="pointDescription"
+        placeholder="Keterangan lokasi..."
+    ></textarea>
 
-        <label>
-            Nama Lokasi
-        </label>
+    <button id="savePoint" class="primary-button">
+        Simpan Titik
+    </button>
 
-        <input
-            id="nama"
-            type="text"
-            placeholder="Contoh: Gudang A"
-        />
-
-
-        <label>
-            Latitude
-        </label>
-
-        <input
-            id="lat"
-            type="text"
-            readonly
-            placeholder="Klik peta"
-        />
+</div>
 
 
-        <label>
-            Longitude
-        </label>
+<!-- ROUTE INFO -->
+<div id="routeCard" class="route-card hidden">
 
-        <input
-            id="lng"
-            type="text"
-            readonly
-            placeholder="Klik peta"
-        />
+    <button id="closeRoute" class="close-button">
+        ×
+    </button>
 
-
-        <label>
-            Status
-        </label>
-
-        <select id="status">
-
-            <option value="Fiktif">
-                Fiktif
-            </option>
-
-            <option value="Asli">
-                Asli
-            </option>
-
-            <option value="Survey">
-                Survey
-            </option>
-
-        </select>
-
-
-        <label>
-            Keterangan
-        </label>
-
-        <textarea
-            id="keterangan"
-            placeholder="Keterangan lokasi..."
-        ></textarea>
-
-
-        <button
-            id="save-point"
-            class="primary-btn"
-        >
-            Simpan Titik
-        </button>
-
+    <div class="route-title">
+        Rute
     </div>
 
+    <div id="routeDistance" class="route-distance">
+        -
+    </div>
 
-    <!-- ==================================================
-         LIBRARIES
-    =================================================== -->
+    <div id="routeTime" class="route-time">
+        -
+    </div>
 
-    <script
-        src="https://unpkg.com/maplibre-gl@5.6.2/dist/maplibre-gl.js"
-    ></script>
-
-
-    <script
-        src="https://unpkg.com/@maplibre/maplibre-gl-geocoder@1.14.0/dist/maplibre-gl-geocoder.min.js"
-    ></script>
+</div>
 
 
-    <!-- ==================================================
-         APP
-    =================================================== -->
+<script src="https://unpkg.com/maplibre-gl@5.6.2/dist/maplibre-gl.js"></script>
 
-    <script src="script.js"></script>
-
+<script src="script.js"></script>
 
 </body>
-
 </html>
