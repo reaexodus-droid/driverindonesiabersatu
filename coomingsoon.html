@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SatuAspal | Segera Hadir</title>
+
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- FontAwesome -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    >
+
+    <style>
+        /* ================================
+           CSS RESET & VARIABLES
+        ================================= */
+
+        :root {
+            --bg-color: #f9fafb;
+            --surface-color: #ffffff;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --accent-color: #0f172a;
+            --border-color: #e5e7eb;
+
+            --container-padding: clamp(1rem, 5vw, 5%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+
+        body {
+            min-height: 100vh;
+
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+
+            -webkit-font-smoothing: antialiased;
+
+            overflow-x: hidden;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        button,
+        a {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+
+        /* ================================
+           NAVBAR
+        ================================= */
+
+        nav {
+            position: fixed;
+
+            top: 0;
+            left: 0;
+
+            z-index: 1000;
+
+            width: 100%;
+            height: 72px;
+
+            padding: 0 var(--container-padding);
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            background-color: rgba(255, 255, 255, 0.96);
+
+            backdrop-filter: blur(10px);
+
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+
+            gap: 8px;
+
+            flex-shrink: 0;
+
+            color: var(--text-primary);
+
+            font-size: clamp(1.05rem, 2vw, 1.25rem);
+            font-weight: 700;
+
+            letter-spacing: -0.5px;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background-color: var(--accent-color);
+
+            color: #fff;
+
+            border-radius: 8px;
+
+            font-size: 0.9rem;
+        }
+
+
+        /* ================================
+           COMING SOON
+        ================================= */
+
+        .coming-soon {
+            min-height: 100vh;
+
+            padding:
+                8rem
+                var(--container-padding)
+                3rem;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            position: relative;
+
+            background-color: var(--surface-color);
+        }
+
+        .coming-container {
+            width: 100%;
+            max-width: 760px;
+
+            margin: 0 auto;
+
+            text-align: center;
+        }
+
+
+        /* ICON */
+
+        .coming-icon {
+            width: 76px;
+            height: 76px;
+
+            margin: 0 auto 2rem;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background-color: var(--bg-color);
+
+            border: 1px solid var(--border-color);
+
+            border-radius: 20px;
+
+            color: var(--accent-color);
+
+            font-size: 1.8rem;
+
+            box-shadow:
+                0 10px 25px rgba(0, 0, 0, 0.04);
+        }
+
+
+        /* TAG */
+
+        .coming-tag {
+            display: inline-flex;
+            align-items: center;
+
+            gap: 8px;
+
+            margin-bottom: 1.25rem;
+
+            padding: 0.45rem 0.85rem;
+
+            border: 1px solid var(--border-color);
+
+            border-radius: 50px;
+
+            background-color: var(--bg-color);
+
+            color: var(--text-secondary);
+
+            font-size: 0.75rem;
+            font-weight: 600;
+
+            letter-spacing: 0.8px;
+
+            text-transform: uppercase;
+        }
+
+        .coming-tag span {
+            width: 7px;
+            height: 7px;
+
+            border-radius: 50%;
+
+            background-color: #22c55e;
+
+            box-shadow:
+                0 0 0 4px rgba(34, 197, 94, 0.1);
+        }
+
+
+        /* HEADING */
+
+        .coming-container h1 {
+            max-width: 700px;
+
+            margin: 0 auto 1.25rem;
+
+            color: var(--text-primary);
+
+            font-size: clamp(2.4rem, 7vw, 4.5rem);
+
+            font-weight: 700;
+
+            line-height: 1.05;
+
+            letter-spacing: -2px;
+        }
+
+        .coming-container h1 span {
+            color: var(--text-secondary);
+        }
+
+
+        /* DESCRIPTION */
+
+        .coming-description {
+            max-width: 600px;
+
+            margin: 0 auto 2.5rem;
+
+            color: var(--text-secondary);
+
+            font-size: clamp(0.95rem, 2vw, 1.1rem);
+
+            line-height: 1.7;
+        }
+
+
+        /* BUTTON */
+
+        .coming-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            gap: 10px;
+
+            padding: 0.9rem 1.5rem;
+
+            background-color: var(--accent-color);
+
+            color: #fff;
+
+            border-radius: 8px;
+
+            font-size: 0.95rem;
+            font-weight: 600;
+
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease,
+                opacity 0.2s ease;
+        }
+
+        .coming-button:hover {
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 10px 20px rgba(15, 23, 42, 0.12);
+        }
+
+
+        /* ================================
+           DECORATION
+        ================================= */
+
+        .coming-decoration {
+            position: absolute;
+
+            width: 100%;
+            max-width: 1100px;
+
+            height: 1px;
+
+            left: 50%;
+            bottom: 90px;
+
+            transform: translateX(-50%);
+
+        
+        }
+
+
+        /* ================================
+           FOOTER
+        ================================= */
+
+        .coming-footer {
+            position: absolute;
+
+            bottom: 25px;
+            left: 0;
+
+            width: 100%;
+
+            padding: 0 var(--container-padding);
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            color: var(--text-secondary);
+
+            font-size: 0.8rem;
+        }
+
+
+        /* ================================
+           MOBILE
+        ================================= */
+
+        @media (max-width: 768px) {
+
+            nav {
+                height: 64px;
+            }
+
+            .coming-soon {
+                padding-top: 6rem;
+                padding-bottom: 5rem;
+            }
+
+            .coming-container h1 {
+                letter-spacing: -1.5px;
+            }
+
+            .coming-icon {
+                width: 68px;
+                height: 68px;
+
+                margin-bottom: 1.5rem;
+
+                border-radius: 17px;
+
+                font-size: 1.5rem;
+            }
+
+            .coming-decoration {
+                bottom: 75px;
+            }
+
+            .coming-footer {
+                bottom: 18px;
+            }
+        }
+
+
+        /* ================================
+           SMALL MOBILE
+        ================================= */
+
+        @media (max-width: 480px) {
+
+            :root {
+                --container-padding: 1rem;
+            }
+
+            .coming-soon {
+                padding-top: 5.5rem;
+                padding-bottom: 4.5rem;
+            }
+
+            .coming-icon {
+                width: 62px;
+                height: 62px;
+
+                margin-bottom: 1.25rem;
+
+                border-radius: 15px;
+
+                font-size: 1.3rem;
+            }
+
+            .coming-tag {
+                font-size: 0.65rem;
+
+                padding: 0.4rem 0.7rem;
+            }
+
+            .coming-container h1 {
+                font-size: 2.35rem;
+
+                letter-spacing: -1.2px;
+            }
+
+            .coming-description {
+                font-size: 0.9rem;
+
+                margin-bottom: 2rem;
+            }
+
+            .coming-button {
+                width: 100%;
+                max-width: 300px;
+
+                padding: 0.85rem 1rem;
+
+                font-size: 0.9rem;
+            }
+
+            .coming-decoration {
+                bottom: 65px;
+            }
+
+            .coming-footer {
+                bottom: 15px;
+
+                font-size: 0.7rem;
+            }
+        }
+
+
+        /* ================================
+           VERY SMALL DEVICE
+        ================================= */
+
+        @media (max-width: 360px) {
+
+            .coming-container h1 {
+                font-size: 2rem;
+            }
+
+            .coming-description {
+                font-size: 0.85rem;
+            }
+
+            .coming-tag {
+                font-size: 0.6rem;
+            }
+        }
+
+
+        /* ================================
+           ACCESSIBILITY
+        ================================= */
+
+        @media (prefers-reduced-motion: reduce) {
+
+            html {
+                scroll-behavior: auto;
+            }
+
+            *,
+            *::before,
+            *::after {
+                transition-duration: 0.01ms !important;
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+
+    <nav>
+        <div class="logo">
+            <div class="logo-icon">
+                <i class="fas fa-route"></i>
+            </div>
+
+            SatuAspal
+        </div>
+    </nav>
+
+
+    <!-- COMING SOON -->
+
+    <main class="coming-soon">
+
+        <div class="coming-container">
+
+            <div class="coming-icon">
+                <i class="fas fa-road"></i>
+            </div>
+
+            <div class="coming-tag">
+                <span></span>
+                Sedang Dipersiapkan
+            </div>
+
+           <h1>
+    Edukasi Pengguna
+    <span>Segera Hadir.</span>
+</h1>
+
+<p class="coming-description">
+    SatuAspal sedang mempersiapkan media sosial sebagai sarana edukasi pengguna layanan driver agar mengurangi kesalahpahaman yang merugikan mitra pengemudi.
+    <br><br>
+    Mulai dari edukasi pemberian rating yang tepat, membedakan kesalahan merchant dan driver, memahami sistem double order, waktu tunggu pesanan, etika berkomunikasi, hingga proses kerja driver di lapangan.
+</p>
+
+            <a
+                href="https://t.me/satuaspalindonesia"
+                class="coming-button"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                Gabung Komunitas
+                <i class="fas fa-arrow-right"></i>
+            </a>
+
+        </div>
+
+
+        <div class="coming-decoration"></div>
+
+
+        <footer class="coming-footer">
+            <div>
+              
+            </div>
+        </footer>
+
+    </main>
+
+</body>
+</html>
